@@ -514,8 +514,9 @@ function showCostumeForPlayer(p){
   cSw.innerHTML=Object.keys(COS).map(k=>{
     const c=COS[k];
     const selected=S.costume[p].includes(k);
+    const iconUrl=`https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/icon_${k}.png`;
     return`<button onclick="openCostumeSample(${p},'${k}')" style="background:${selected?'rgba(200,160,255,0.3)':'rgba(255,255,255,0.05)'};border:1.5px solid ${selected?'rgba(255,150,200,0.6)':'rgba(200,160,255,0.3)'};border-radius:6px;padding:6px 8px;color:${selected?'#ffccee':'#fff'};font-size:10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;" ${selected?'disabled':''}>
-      <span style="font-size:14px;">${c.e}</span>
+      <img src="${iconUrl}" style="width:20px;height:20px;object-fit:contain;">
       <span style="flex:1;text-align:left;">${c[S.lang]}</span>
       ${selected?'<span style="color:#ffaacc;">✓</span>':''}
     </button>`;
@@ -535,7 +536,7 @@ function showCostumeForPlayer(p){
   
   // アバター更新（将来的にAfter画像に対応）
   document.getElementById('costume-avatar').src='https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/base.png';
-  document.getElementById('avatar-label').textContent='Before';
+  document.getElementById('avatar-label').textContent=S.lang==='ja'?'Preview':'Preview';
 }
 const COSTUME_SAMPLES={kimono:'sample_kimono_1.png',ninja:'sample_ninja_1.png',catear:'sample_catear_1.png',uniform:'sample_uniform_1.png',other:'sample_other_1.png'};
 let costumePopupPlayer=0;
