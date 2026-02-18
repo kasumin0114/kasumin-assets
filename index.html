@@ -291,7 +291,8 @@ body{background:#0d0b1a;display:flex;justify-content:center;align-items:center;m
   <button onclick="closeCostumePopup()" style="position:absolute;top:12px;right:14px;background:transparent;border:none;color:#e0c0ff;font-size:22px;cursor:pointer;">✕</button>
   <div style="font-size:22px;margin-bottom:4px;" id="costume-popup-emoji"></div>
   <div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:10px;letter-spacing:0.08em;" id="costume-popup-name"></div>
-  <div style="width:100%;max-width:280px;border-radius:10px;overflow:hidden;border:2px solid rgba(200,160,255,0.4);margin-bottom:10px;background:rgba(255,255,255,0.05);min-height:200px;display:flex;align-items:center;justify-content:center;">
+  <!-- サンプル -->
+  <div style="width:100%;max-width:280px;border-radius:10px;overflow:hidden;border:2px solid rgba(200,160,255,0.4);margin-bottom:10px;background:rgba(255,255,255,0.05);min-height:180px;display:flex;align-items:center;justify-content:center;">
     <img id="costume-popup-sample" style="width:100%;display:block;">
   </div>
   <div style="font-size:10px;color:#ffaacc;margin-bottom:14px;">+¥500</div>
@@ -299,14 +300,31 @@ body{background:#0d0b1a;display:flex;justify-content:center;align-items:center;m
 </div>
 
 <div class="sub" id="sub-costume">
+  <img src="https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/dresser.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.3;z-index:-1;">
   <div class="sub-hdr"><span class="sub-ttl" id="costume-title"></span><button class="back" onclick="backCostume()" id="costume-back"></button></div>
-  <div class="sub-content">
-    <div class="player-indicator" id="costume-player"></div>
-    <div class="section-title" id="section-costume-title"></div>
-    <div class="opt-grid" id="costume-grid"></div>
-    <div class="section-title" id="section-item-title"></div>
-    <div class="opt-grid col3" id="item-grid"></div>
-    <button class="decide-btn" onclick="nextCostume()" id="costume-decide"></button>
+  <div style="flex:1;padding:8px 10px;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="player-indicator" id="costume-player" style="margin-bottom:6px;"></div>
+    <!-- 3分割レイアウト -->
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;min-height:0;">
+      <!-- 左上：アバター -->
+      <div style="grid-row:1/3;background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+        <div style="font-size:9px;color:#9070aa;margin-bottom:4px;" id="avatar-label">Before</div>
+        <div style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img id="costume-avatar" src="https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/base.png" style="max-width:100%;max-height:100%;object-fit:contain;">
+        </div>
+      </div>
+      <!-- 右上：Costumeスイッチ -->
+      <div style="background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:6px;overflow-y:auto;">
+        <div style="font-size:10px;color:#e0c0ff;margin-bottom:4px;font-weight:700;">Costume</div>
+        <div id="costume-switches" style="display:flex;flex-direction:column;gap:4px;"></div>
+      </div>
+      <!-- 右下：Itemスイッチ -->
+      <div style="background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:6px;overflow-y:auto;">
+        <div style="font-size:10px;color:#e0c0ff;margin-bottom:4px;font-weight:700;">Item</div>
+        <div id="item-switches" style="display:flex;flex-direction:column;gap:4px;"></div>
+      </div>
+    </div>
+    <button class="decide-btn" onclick="nextCostume()" id="costume-decide" style="margin-top:8px;"></button>
   </div>
 </div>
 
@@ -482,35 +500,84 @@ function openSub(type){document.querySelectorAll('.sub').forEach(s=>s.classList.
 function closeSub(type){document.getElementById('sub-'+type).classList.remove('show');if(editingMode){editingMode=false;showResult();}else{setDialog('select_category');updateBadge(type);checkShowBtn();}}
 function pickBg(btn,k){document.querySelectorAll('#bg-grid .opt-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');S.bg=k;}
 function openCostume(){currentPlayer=0;showCostumeForPlayer(0);document.getElementById('sub-costume').classList.add('show');document.getElementById('free-area').classList.remove('show');}
-function showCostumeForPlayer(p){const t=T[S.lang];document.getElementById('costume-title').textContent=t.costume_title;document.getElementById('costume-back').textContent=t.back_btn;document.getElementById('section-costume-title').textContent=t.section_costume;document.getElementById('section-item-title').textContent=t.section_item;document.getElementById('costume-decide').textContent=t.decide_btn;document.getElementById('costume-player').textContent=t.name_label+(p+1)+'（'+S.names[p]+'）'+t.player_costume;const msg=S.names[p]+t.select_costume;document.getElementById('dtxt').innerHTML=msg+'<span class="blink">▮</span>';const cg=document.getElementById('costume-grid');const ig=document.getElementById('item-grid');cg.innerHTML=Object.keys(COS).map(k=>{const c=COS[k];const on=S.costume[p].includes(k)?'on':'';return`<button class="opt-btn ${on}" onclick="pickCostume(${p},'${k}',this)"><span class="opt-e">${c.e}</span><span class="opt-l">${c[S.lang]}</span></button>`;}).join('');ig.innerHTML=Object.keys(ITM).map(k=>{const i=ITM[k];const on=S.item[p].includes(k)?'on':'';return`<button class="opt-btn ${on}" onclick="pickItem(${p},'${k}',this)"><span class="opt-e">${i.e}</span><span class="opt-l">${i[S.lang]}</span></button>`;}).join('');}
+function showCostumeForPlayer(p){
+  const t=T[S.lang];
+  document.getElementById('costume-title').textContent=t.costume_title;
+  document.getElementById('costume-back').textContent=t.back_btn;
+  document.getElementById('costume-decide').textContent=t.decide_btn;
+  document.getElementById('costume-player').textContent=t.name_label+(p+1)+'（'+S.names[p]+'）'+t.player_costume;
+  const msg=S.names[p]+t.select_costume;
+  document.getElementById('dtxt').innerHTML=msg+'<span class="blink">▮</span>';
+  
+  // Costumeスイッチ生成
+  const cSw=document.getElementById('costume-switches');
+  cSw.innerHTML=Object.keys(COS).map(k=>{
+    const c=COS[k];
+    const selected=S.costume[p].includes(k);
+    return`<button onclick="openCostumeSample(${p},'${k}')" style="background:${selected?'rgba(200,160,255,0.3)':'rgba(255,255,255,0.05)'};border:1.5px solid ${selected?'rgba(255,150,200,0.6)':'rgba(200,160,255,0.3)'};border-radius:6px;padding:6px 8px;color:${selected?'#ffccee':'#fff'};font-size:10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;" ${selected?'disabled':''}>
+      <span style="font-size:14px;">${c.e}</span>
+      <span style="flex:1;text-align:left;">${c[S.lang]}</span>
+      ${selected?'<span style="color:#ffaacc;">✓</span>':''}
+    </button>`;
+  }).join('');
+  
+  // Itemスイッチ生成
+  const iSw=document.getElementById('item-switches');
+  iSw.innerHTML=Object.keys(ITM).map(k=>{
+    const i=ITM[k];
+    const selected=S.item[p].includes(k);
+    return`<button onclick="openItemSample(${p},'${k}')" style="background:${selected?'rgba(200,160,255,0.3)':'rgba(255,255,255,0.05)'};border:1.5px solid ${selected?'rgba(255,150,200,0.6)':'rgba(200,160,255,0.3)'};border-radius:6px;padding:6px 8px;color:${selected?'#ffccee':'#fff'};font-size:10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;" ${selected?'disabled':''}>
+      <span style="font-size:14px;">${i.e}</span>
+      <span style="flex:1;text-align:left;">${i[S.lang]}</span>
+      ${selected?'<span style="color:#ffaacc;">✓</span>':''}
+    </button>`;
+  }).join('');
+  
+  // アバター更新（将来的にAfter画像に対応）
+  document.getElementById('costume-avatar').src='https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/base.png';
+  document.getElementById('avatar-label').textContent='Before';
+}
 const COSTUME_SAMPLES={kimono:'sample_kimono_1.png',ninja:'sample_ninja_1.png',catear:'sample_catear_1.png',uniform:'sample_uniform_1.png',other:'sample_other_1.png'};
 let costumePopupPlayer=0;
 let costumePopupKey='';
-function pickCostume(p,k,btn){
+let costumePopupType='';
+function openCostumeSample(p,k){
   costumePopupPlayer=p;
   costumePopupKey=k;
+  costumePopupType='costume';
   const c=COS[k];
-  const hasSelected=S.costume[p].includes(k);
   document.getElementById('costume-popup-emoji').textContent=c.e;
   document.getElementById('costume-popup-name').textContent=S.lang==='ja'?c.ja:c.en;
   const sampleImg=document.getElementById('costume-popup-sample');
   const sampleUrl=COSTUME_SAMPLES[k];
   if(sampleUrl){sampleImg.src='https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/'+sampleUrl;sampleImg.style.display='block';}
   else{sampleImg.style.display='none';}
-  document.getElementById('costume-popup-select-btn').textContent=hasSelected?(S.lang==='ja'?'✦ 選択解除':'✦ Deselect'):(S.lang==='ja'?'✦ これを選ぶ！':'✦ Select this!');
+  document.getElementById('costume-popup-select-btn').textContent=S.lang==='ja'?'✦ これを選ぶ！':'✦ Select this!';
+  document.getElementById('costume-popup').style.display='flex';
+}
+function openItemSample(p,k){
+  costumePopupPlayer=p;
+  costumePopupKey=k;
+  costumePopupType='item';
+  const i=ITM[k];
+  document.getElementById('costume-popup-emoji').textContent=i.e;
+  document.getElementById('costume-popup-name').textContent=S.lang==='ja'?i.ja:i.en;
+  document.getElementById('costume-popup-sample').style.display='none';
+  document.getElementById('costume-popup-select-btn').textContent=S.lang==='ja'?'✦ これを選ぶ！':'✦ Select this!';
   document.getElementById('costume-popup').style.display='flex';
 }
 function closeCostumePopup(){document.getElementById('costume-popup').style.display='none';}
 function selectCostumeFromPopup(){
   const p=costumePopupPlayer;
   const k=costumePopupKey;
-  const hasIt=S.costume[p].includes(k);
-  if(hasIt)S.costume[p]=S.costume[p].filter(x=>x!==k);
-  else S.costume[p].push(k);
+  if(costumePopupType==='costume'){
+    S.costume[p].push(k);
+  }else{
+    S.item[p].push(k);
+  }
   closeCostumePopup();
   showCostumeForPlayer(p);
 }
-function pickItem(p,k,btn){btn.classList.toggle('on');if(btn.classList.contains('on')){if(!S.item[p].includes(k))S.item[p].push(k);}else S.item[p]=S.item[p].filter(x=>x!==k);}
 function nextCostume(){if(editingMode){editingMode=false;document.getElementById('sub-costume').classList.remove('show');showResult();}else{currentPlayer++;if(currentPlayer<S.numPlayers)showCostumeForPlayer(currentPlayer);else{document.getElementById('sub-costume').classList.remove('show');setDialog('select_category');updateBadge('costume');checkShowBtn();}}}
 function backCostume(){if(currentPlayer>0){currentPlayer--;showCostumeForPlayer(currentPlayer);}else{document.getElementById('sub-costume').classList.remove('show');setDialog('select_category');}}
 function openMood(){currentPlayer=0;showMoodForPlayer(0);document.getElementById('sub-mood').classList.add('show');document.getElementById('free-area').classList.remove('show');}
