@@ -285,6 +285,19 @@ body{background:#0d0b1a;display:flex;justify-content:center;align-items:center;m
   <button onclick="selectBgFromPopup()" style="background:linear-gradient(135deg,#9060d0,#d060a0);border:none;border-radius:8px;color:white;font-family:'DotGothic16',monospace;font-size:12px;padding:11px 28px;cursor:pointer;letter-spacing:0.1em;box-shadow:0 4px 12px rgba(192,96,160,0.5);" id="popup-select-btn"></button>
 </div>
 
+<!-- コスチュームサンプルポップアップ -->
+
+<div id="costume-popup" style="display:none;position:absolute;inset:0;background:rgba(8,6,20,0.95);z-index:50;flex-direction:column;align-items:center;justify-content:center;padding:16px;">
+  <button onclick="closeCostumePopup()" style="position:absolute;top:12px;right:14px;background:transparent;border:none;color:#e0c0ff;font-size:22px;cursor:pointer;">✕</button>
+  <div style="font-size:22px;margin-bottom:4px;" id="costume-popup-emoji"></div>
+  <div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:10px;letter-spacing:0.08em;" id="costume-popup-name"></div>
+  <div style="width:100%;max-width:280px;border-radius:10px;overflow:hidden;border:2px solid rgba(200,160,255,0.4);margin-bottom:10px;background:rgba(255,255,255,0.05);min-height:200px;display:flex;align-items:center;justify-content:center;">
+    <img id="costume-popup-sample" style="width:100%;display:block;">
+  </div>
+  <div style="font-size:10px;color:#ffaacc;margin-bottom:14px;">+¥500</div>
+  <button onclick="selectCostumeFromPopup()" style="background:linear-gradient(135deg,#9060d0,#d060a0);border:none;border-radius:8px;color:white;font-family:'DotGothic16',monospace;font-size:12px;padding:11px 28px;cursor:pointer;letter-spacing:0.1em;box-shadow:0 4px 12px rgba(192,96,160,0.5);" id="costume-popup-select-btn"></button>
+</div>
+
 <div class="sub" id="sub-costume">
   <div class="sub-hdr"><span class="sub-ttl" id="costume-title"></span><button class="back" onclick="backCostume()" id="costume-back"></button></div>
   <div class="sub-content">
@@ -470,7 +483,33 @@ function closeSub(type){document.getElementById('sub-'+type).classList.remove('s
 function pickBg(btn,k){document.querySelectorAll('#bg-grid .opt-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');S.bg=k;}
 function openCostume(){currentPlayer=0;showCostumeForPlayer(0);document.getElementById('sub-costume').classList.add('show');document.getElementById('free-area').classList.remove('show');}
 function showCostumeForPlayer(p){const t=T[S.lang];document.getElementById('costume-title').textContent=t.costume_title;document.getElementById('costume-back').textContent=t.back_btn;document.getElementById('section-costume-title').textContent=t.section_costume;document.getElementById('section-item-title').textContent=t.section_item;document.getElementById('costume-decide').textContent=t.decide_btn;document.getElementById('costume-player').textContent=t.name_label+(p+1)+'（'+S.names[p]+'）'+t.player_costume;const msg=S.names[p]+t.select_costume;document.getElementById('dtxt').innerHTML=msg+'<span class="blink">▮</span>';const cg=document.getElementById('costume-grid');const ig=document.getElementById('item-grid');cg.innerHTML=Object.keys(COS).map(k=>{const c=COS[k];const on=S.costume[p].includes(k)?'on':'';return`<button class="opt-btn ${on}" onclick="pickCostume(${p},'${k}',this)"><span class="opt-e">${c.e}</span><span class="opt-l">${c[S.lang]}</span></button>`;}).join('');ig.innerHTML=Object.keys(ITM).map(k=>{const i=ITM[k];const on=S.item[p].includes(k)?'on':'';return`<button class="opt-btn ${on}" onclick="pickItem(${p},'${k}',this)"><span class="opt-e">${i.e}</span><span class="opt-l">${i[S.lang]}</span></button>`;}).join('');}
-function pickCostume(p,k,btn){btn.classList.toggle('on');if(btn.classList.contains('on')){if(!S.costume[p].includes(k))S.costume[p].push(k);}else S.costume[p]=S.costume[p].filter(x=>x!==k);}
+const COSTUME_SAMPLES={kimono:'sample_kimono_1.png',ninja:'sample_ninja_1.png',catear:'sample_catear_1.png',uniform:'sample_uniform_1.png',other:'sample_other_1.png'};
+let costumePopupPlayer=0;
+let costumePopupKey='';
+function pickCostume(p,k,btn){
+  costumePopupPlayer=p;
+  costumePopupKey=k;
+  const c=COS[k];
+  const hasSelected=S.costume[p].includes(k);
+  document.getElementById('costume-popup-emoji').textContent=c.e;
+  document.getElementById('costume-popup-name').textContent=S.lang==='ja'?c.ja:c.en;
+  const sampleImg=document.getElementById('costume-popup-sample');
+  const sampleUrl=COSTUME_SAMPLES[k];
+  if(sampleUrl){sampleImg.src='https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/'+sampleUrl;sampleImg.style.display='block';}
+  else{sampleImg.style.display='none';}
+  document.getElementById('costume-popup-select-btn').textContent=hasSelected?(S.lang==='ja'?'✦ 選択解除':'✦ Deselect'):(S.lang==='ja'?'✦ これを選ぶ！':'✦ Select this!');
+  document.getElementById('costume-popup').style.display='flex';
+}
+function closeCostumePopup(){document.getElementById('costume-popup').style.display='none';}
+function selectCostumeFromPopup(){
+  const p=costumePopupPlayer;
+  const k=costumePopupKey;
+  const hasIt=S.costume[p].includes(k);
+  if(hasIt)S.costume[p]=S.costume[p].filter(x=>x!==k);
+  else S.costume[p].push(k);
+  closeCostumePopup();
+  showCostumeForPlayer(p);
+}
 function pickItem(p,k,btn){btn.classList.toggle('on');if(btn.classList.contains('on')){if(!S.item[p].includes(k))S.item[p].push(k);}else S.item[p]=S.item[p].filter(x=>x!==k);}
 function nextCostume(){if(editingMode){editingMode=false;document.getElementById('sub-costume').classList.remove('show');showResult();}else{currentPlayer++;if(currentPlayer<S.numPlayers)showCostumeForPlayer(currentPlayer);else{document.getElementById('sub-costume').classList.remove('show');setDialog('select_category');updateBadge('costume');checkShowBtn();}}}
 function backCostume(){if(currentPlayer>0){currentPlayer--;showCostumeForPlayer(currentPlayer);}else{document.getElementById('sub-costume').classList.remove('show');setDialog('select_category');}}
