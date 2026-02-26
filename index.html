@@ -309,19 +309,19 @@ body{background:#0d0b1a;display:flex;justify-content:center;align-items:center;m
       <!-- 左上：アバター -->
       <div style="grid-row:1/3;background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:4px;display:flex;flex-direction:column;overflow:hidden;min-height:0;">
         <div style="font-size:9px;color:#9070aa;margin-bottom:2px;text-align:center;flex-shrink:0;" id="avatar-label">Before</div>
-        <div style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0;">
+        <div style="flex:1;width:100%;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;min-height:0;padding-top:4px;">
           <img id="costume-avatar" src="https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/base.png" style="max-width:100%;max-height:100%;object-fit:contain;">
         </div>
       </div>
       <!-- 右上：Costumeスイッチ -->
-      <div style="background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:4px;overflow-y:auto;min-height:0;display:flex;flex-direction:column;">
+      <div style="background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:4px;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;max-height:100%;display:flex;flex-direction:column;">
         <div style="font-size:10px;color:#e0c0ff;margin-bottom:3px;font-weight:700;flex-shrink:0;">Costume</div>
         <div id="costume-switches" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;"></div>
       </div>
       <!-- 右下：Itemスイッチ -->
-      <div style="background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:4px;overflow-y:auto;min-height:0;display:flex;flex-direction:column;">
+      <div style="background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:4px;overflow-y:scroll;-webkit-overflow-scrolling:touch;min-height:0;max-height:100%;display:flex;flex-direction:column;">
         <div style="font-size:10px;color:#e0c0ff;margin-bottom:3px;font-weight:700;flex-shrink:0;">Item</div>
-        <div id="item-switches" style="display:flex;flex-direction:column;gap:3px;"></div>
+        <div id="item-switches" style="display:flex;flex-direction:column;gap:3px;flex:1;"></div>
       </div>
     </div>
     <button class="decide-btn" onclick="nextCostume()" id="costume-decide" style="margin-top:8px;"></button>
@@ -611,7 +611,12 @@ function editFree(){editingMode=true;document.getElementById('result').classList
 function generateQR(url){const wrap=document.getElementById('qr-wrap');wrap.innerHTML='';new QRCode(wrap,{text:url,width:140,height:140,colorDark:'#1a0a2e',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
 function buildOrderURL(data){const base=location.href.split('?')[0];const p=new URLSearchParams();p.set('v','1');if(data.lang)p.set('l',data.lang);if(data.numPlayers)p.set('n',data.numPlayers);if(data.names&&data.names.length)p.set('nm',data.names.join(','));if(data.needTranslate)p.set('tr','1');if(data.bg)p.set('bg',data.bg);if(data.costume&&data.costume.some(a=>a.length))p.set('co',data.costume.map(a=>a.join('+')).join('|'));if(data.item&&data.item.some(a=>a.length))p.set('it',data.item.map(a=>a.join('+')).join('|'));if(data.mood&&data.mood.some(a=>a.length))p.set('mo',data.mood.map(a=>a.join('+')).join('|'));if(data.pets&&data.pets.length)p.set('pt',data.pets.join(','));if(data.free)p.set('fr',data.free);if(data.freeFormText)p.set('ff',data.freeFormText);return base+'?'+p.toString();}
 function loadFromURL(){const p=new URLSearchParams(location.search);if(!p.get('v'))return false;S.lang=p.get('l')||'ja';S.numPlayers=parseInt(p.get('n'))||1;S.names=(p.get('nm')||'').split(',').filter(Boolean);S.needTranslate=p.get('tr')==='1';S.bg=p.get('bg')||'';S.costume=(p.get('co')||'').split('|').map(s=>s?s.split('+').filter(Boolean):[]);S.item=(p.get('it')||'').split('|').map(s=>s?s.split('+').filter(Boolean):[]);S.mood=(p.get('mo')||'').split('|').map(s=>s?s.split('+').filter(Boolean):[]);S.pets=(p.get('pt')||'').split(',').filter(Boolean);S.free=p.get('fr')||'';S.freeFormText=p.get('ff')||'';if(S.freeFormText)showFreeFormResult();else showResult();return true;}
-window.addEventListener('load',()=>{if(!loadFromURL()){document.getElementById('scr-lang').classList.add('show');}});
+window.addEventListener('load',()=>{
+  if(!loadFromURL()){document.getElementById('scr-lang').classList.add('show');}
+  // サンプル画像プリロード
+  const preloadSamples=['sample_kimono.jpg','sample_ninja.jpg','sample_catear.jpg','sample_uniform.jpg','sample_other.jpg'];
+  preloadSamples.forEach(src=>{const img=new Image();img.src='https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/'+src;});
+});
 </script>
 
 </body>
