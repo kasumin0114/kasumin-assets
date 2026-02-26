@@ -307,9 +307,9 @@ body{background:#0d0b1a;display:flex;justify-content:center;align-items:center;m
     <!-- 3分割レイアウト -->
     <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;min-height:0;">
       <!-- 左上：アバター -->
-      <div style="grid-row:1/3;background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
-        <div style="font-size:9px;color:#9070aa;margin-bottom:4px;" id="avatar-label">Before</div>
-        <div style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+      <div style="grid-row:1/3;background:rgba(8,6,20,0.7);border:2px solid rgba(200,160,255,0.4);border-radius:8px;padding:4px;display:flex;flex-direction:column;overflow:hidden;">
+        <div style="font-size:9px;color:#9070aa;margin-bottom:2px;text-align:center;" id="avatar-label">Before</div>
+        <div style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0;">
           <img id="costume-avatar" src="https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/base.png" style="max-width:100%;max-height:100%;object-fit:contain;">
         </div>
       </div>
@@ -510,14 +510,25 @@ function showCostumeForPlayer(p){
   const msg=S.names[p]+t.select_costume;
   document.getElementById('dtxt').innerHTML=msg+'<span class="blink">▮</span>';
   
-  // Costumeスイッチ生成
+  // Costumeスイッチ生成（並び順：none, artist, kimono, ninja, catear, uniform）
   const cSw=document.getElementById('costume-switches');
-  cSw.innerHTML=Object.keys(COS).map(k=>{
+  const cosOrder=['none','artist','kimono','ninja','catear','uniform'];
+  cSw.innerHTML=cosOrder.map(k=>{
     const c=COS[k];
     const selected=S.costume[p].includes(k);
     const isNone=k==='none';
-    const iconHtml=isNone?`<span style="font-family:'Courier New',monospace;font-size:16px;font-weight:700;letter-spacing:0.05em;">NONE</span>`:`<img src="https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/icon_${k}.png" style="width:40px;height:40px;object-fit:contain;">`;
-    return`<button onclick="openCostumeSample(${p},'${k}')" style="position:relative;background:${selected?'rgba(200,160,255,0.3)':'rgba(255,255,255,0.05)'};border:1.5px solid ${selected?'rgba(255,150,200,0.6)':'rgba(200,160,255,0.3)'};border-radius:8px;padding:8px;color:${selected?'#ffccee':'#fff'};font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;min-height:56px;" ${selected?'disabled':''}>
+    const isArtist=k==='artist';
+    const isUniform=k==='uniform';
+    let iconHtml='';
+    if(isNone){
+      iconHtml=`<span style="font-family:'Courier New',monospace;font-size:18px;font-weight:700;letter-spacing:0.05em;">NONE</span>`;
+    }else if(isArtist){
+      iconHtml=`<span style="font-size:32px;">${c.e}</span>`;
+    }else{
+      iconHtml=`<img src="https://cdn.jsdelivr.net/gh/kasumin0114/kasumin-assets@main/icon_${k}.png" style="width:100%;height:100%;object-fit:contain;">`;
+    }
+    const gridSpan=isUniform?'grid-column:1/3;':'';
+    return`<button onclick="openCostumeSample(${p},'${k}')" style="position:relative;${gridSpan}background:${selected?'rgba(200,160,255,0.3)':'rgba(255,255,255,0.05)'};border:1.5px solid ${selected?'rgba(255,150,200,0.6)':'rgba(200,160,255,0.3)'};border-radius:8px;padding:6px;color:${selected?'#ffccee':'#fff'};font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;min-height:56px;" ${selected?'disabled':''}>
       ${iconHtml}
       ${selected?'<span style="color:#ffaacc;position:absolute;top:4px;right:4px;font-size:12px;">✓</span>':''}
     </button>`;
